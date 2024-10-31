@@ -66,23 +66,23 @@
         // Reference to the elements
         const imageUpload = document.getElementById('imageUpload');
         const imageContainer = document.getElementById('imageContainer');
-        
+
         // Function to extract the numeric part from a filename
         function extractNumberFromFilename(filename) {
             const match = filename.match(/(\d+)/); // Find the first sequence of digits
             return match ? parseInt(match[0], 10) : null; // Return the number or null
         }
-        
+
         // Event listener for file input change (upload images)
         imageUpload.addEventListener('change', function(event) {
             const files = Array.from(event.target.files); // Get the selected files
-        
+
             // Clear the container before appending new images
             imageContainer.innerHTML = '';
-        
+
             // Define accepted file types
             const acceptedTypes = ['image/jpeg', 'image/png', 'image/webp'];
-        
+
             // Filter only accepted image types and extract number from filename
             const imageFiles = files
                 .filter(file => acceptedTypes.includes(file.type)) // Filter only accepted types
@@ -92,54 +92,52 @@
                     number: extractNumberFromFilename(file.name) // Extract numeric part safely
                 }))
                 .filter(fileObj => fileObj.number !== null); // Filter out files without a numeric part
-        
+
             // Sort the array by the numeric key
             imageFiles.sort((a, b) => a.number - b.number);
-        
+
             // Create an array of promises for reading files
             const readPromises = imageFiles.map(({ file, name }) => {
                 return new Promise((resolve) => {
                     const reader = new FileReader();
-        
+
                     // On load, resolve with the image data and filename
                     reader.onload = function(e) {
                         resolve({ src: e.target.result, name });
                     };
-        
+
                     // Read the image file as a data URL
                     reader.readAsDataURL(file);
                 });
             });
-        
+
             // Wait for all files to be read
             Promise.all(readPromises).then((imageData) => {
                 // Loop through each image data
                 imageData.forEach(({ src, name }) => {
                     const imageBox = document.createElement('div');
                     imageBox.classList.add('image-box');
-        
+
                     // Create the image element
                     const img = document.createElement('img');
                     img.src = src;
-        
+
                     // Create a label to display the file name
                     const label = document.createElement('div');
                     label.classList.add('image-label');
                     label.textContent = name; // Set the file name as text
-        
+
                     // Append image and label to the image box
                     imageBox.appendChild(img);
                     imageBox.appendChild(label);
-        
+
                     // Append the image box to the container
                     imageContainer.appendChild(imageBox);
                 });
             });
         });
 
-        // 
-        // 
-        // Reference to the elements
+        // // Reference to the elements
         // const imageUpload = document.getElementById('imageUpload');
         // // let txt = "";
         // // let info = document.getElementById('info');
